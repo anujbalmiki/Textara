@@ -1,0 +1,161 @@
+{% extends "base.html"%}
+{% load static %}
+{% block content %}
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
+    <style>
+        .scrollable-menu {
+        height: auto;
+        max-height: 200px;
+        overflow-x: hidden;
+        }
+
+        .skeleton{
+            opacity: 0.5;
+            animation: skeleton-loading 1s linear infinite alternate;
+        }
+
+        .skeleton-text{
+            width: 100%;
+            height: 1rem;
+            border-radius: .125rem;
+        }
+
+        @keyframes skeleton-loading{
+            0%{
+                background-color: hsl(200, 20%, 70%);
+            }
+            100%{
+                background-color: hsl(200, 20%, 95%);
+            }
+        }
+    </style>
+    <script src="{% static 'js\jquery-3.6.0.js' %}"></script>
+    <script src="{% static 'js\jquery-3.6.0.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<div class="p-5">
+    <center><h1 style="margin: 1rem;">Welcome to Textara</h1></center>
+    <div class="container d-flex align-items-center justify-content-center border border-5 p-5 rounded">
+        <form action="recognize" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <center>
+                    <h3>Browse a image</h3>
+                    <center><br><input type="file" name="file1" class="form-control-file" id="file_name"><br>
+                    </center><br>
+                </center>
+                <center><button type="submit" class="btn btn-primary mb-2" id="processbtn">Process</button></center>
+            </div>
+            <!-- to get the name of the image file from the views.py -->
+            <center><h5 id="name" hidden="true">{{file}}</h5></center> 
+        </form><br>
+    </div><br>
+
+    <div class="container border border-5 rounded p-5" style="width: 50rem;">
+        <div class="row">
+            <center><h5>Recognized Text:</h5></center>
+            <div>
+                <div>
+                    <h5 id="reco_text" class="skeleton skeleton-text"></h5>
+                </div>
+                <div>
+                    <h5 id="reco_text12" class="skeleton skeleton-text"></h5>
+                </div>
+                <div>
+                    <h5 id="reco_text13" class="skeleton skeleton-text"></h5>
+                </div>
+                <div>
+                    <h5 id="reco_text14" class="skeleton skeleton-text"></h5>
+                </div>
+            </div><br>
+            <div class="d-flex justify-content-center align-items-center">
+                <form method="post" action="your_activities/">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary" id="savebtn" value="Save" disabled="true">
+                </form>
+                <h1>&nbsp;&nbsp;</h1>
+                <form method="post" action="translator/">
+                    {% csrf_token %}
+                    <input id="recognized_text3" type="text" name="rec_text3" hidden="true">
+                    <input type="submit" class="btn btn-primary" id="translatebtn" value="Translate" disabled="true">
+                </form>
+                <h1>&nbsp;&nbsp;</h1>
+                <form method="post" action="google_search/">
+                    {% csrf_token %}
+                    <input id="recognized_text4" type="text" name="rec_text4" hidden="true">
+                    <input type="submit" class="btn btn-primary" id="searchbtn" value="Search" disabled="true">
+                </form>
+            </div>
+        </div>
+    </div><br>
+
+    <div class="container d-flex border border-5 rounded p-5 justify-content-center" style="width: 50rem;">
+        <center><img src="media/{{file}}" alt="Uploaded Image" style="max-height: 100%; max-width: 100%;"></center>
+    </div>
+
+    <form method="post" action="save_activity" id="form1">
+        {% csrf_token %}
+        <div class="form-group m-3">
+            <input id="recognized_text" type="text" name="rec_text" hidden="true">
+        </div>
+    </form><br>
+
+
+</div>
+<script>
+    document.getElementById("reco_text").style.visibility = "hidden";
+    document.getElementById("reco_text12").style.visibility = "hidden";
+    document.getElementById("reco_text13").style.visibility = "hidden";
+    document.getElementById("reco_text14").style.visibility = "hidden";
+    fn1 = document.getElementById("name").innerHTML; //get the name of file
+    console.log(fn1)
+    fn2 = "./media/{{file}}";       //this is the path for the image
+    var file_name = "./media/{{file}}"; //fn2.concat(fn1);    //concatinating the path and the file image to pass it to the function
+
+    console.log(file_name)
+    var languages = '+afr + amh + asm + aze + aze_cyrl + bel + bod + bos + bre + bul + cat + ceb + ces + chi_sim + chi_tra + chr + cos + cym + dan + dan_frak + deu + deu_frak + dzo + ell + enm + epo + equ + est + eus + fao + fas + fil + fin + fra + frk + frm + fry + gla + gle + glg + grc + guj + hat + heb + hrv + hun + hye + iku + ind + isl + jav + jpn + kan + kat + kat_old + kaz + khm + kir + kmr + kor_vert + kur + lao + lat + lav + lit + ltz + mal + mar + mkd + mlt + mon + msa + mya + nep + nld + nor + oci + ori + osd + pan + pol + por + pus + que + ron + rus + san + sin + slk + slk_frak + slv + snd + spa + spa_old + sqi + srp + srp_latn + sun + swa + swe + syr + tam + tat + tel + tgk + tgl + tha + tir + ton + ton + tur + uig + ukr + urd + uzb + uzb_cyrl + vie + yid + yor'
+
+    if(file_name == "./media/"){
+        console.log("There is no image file selected")
+    }
+    else{
+        document.getElementById("reco_text").style.visibility = "visible";
+        document.getElementById("reco_text12").style.visibility = "visible";
+        document.getElementById("reco_text13").style.visibility = "visible";
+        document.getElementById("reco_text14").style.visibility = "visible";
+        document.getElementById("processbtn").disabled = true;
+        document.getElementById("file_name").disabled = true;
+        Tesseract.recognize(
+            file_name,             // passed the file path
+            //passed the language of the text in the image
+            'eng+hin+ara+mar',
+            { logger: m => console.log(m) }  //logging the progress to the console
+        ).then(({ data: { text } }) => {
+            document.getElementById("reco_text").innerHTML = text;  //displaying it into html page as output
+            console.log(text);
+
+            recognized_text = text;
+            document.getElementById("recognized_text").value = recognized_text;
+            document.getElementById("recognized_text3").value = recognized_text;
+            document.getElementById("recognized_text4").value = recognized_text;
+            console.log("done");
+
+            document.getElementById("form1").submit(); //to pass the text to python view to save it into databse
+            document.getElementById("file_name").disabled = false;
+            document.getElementById("processbtn").disabled = false;
+            document.getElementById("savebtn").disabled = false;
+            document.getElementById("translatebtn").disabled = false;
+            document.getElementById("searchbtn").disabled = false;
+            document.getElementById("reco_text").classList.remove("skeleton-text","skeleton");
+            document.getElementById("reco_text12").classList.remove("skeleton-text","skeleton");
+            document.getElementById("reco_text13").classList.remove("skeleton-text","skeleton");
+            document.getElementById("reco_text14").classList.remove("skeleton-text","skeleton");
+        })
+    }
+</script>
+{% endblock %}
